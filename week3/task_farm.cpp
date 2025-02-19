@@ -68,10 +68,10 @@ void master (int nworker) {
     
     // Print out a status on how many tasks were completed by each worker
     int workdone = 0;
-    for (int worker = 0; worker <= nworker; worker++)
+    for (int worker = 1; worker <= nworker; worker++)
     {
         int tasksdone = 0; 
-        for (int itask=1; itask<NTASKS; itask++)
+        for (int itask=0; itask<NTASKS; itask++)
         if (result[itask]==worker) {
             tasksdone++;
             workdone ++;
