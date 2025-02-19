@@ -19,6 +19,12 @@ const int NTASKS=5000;  // number of tasks
 const int RANDOM_SEED=1234;
 const int rest_signal = -999; // signal to rest, job done
 
+// call this function to complete the task. It sleeps for task milliseconds
+void task_function(int task)
+{
+    std::this_thread::sleep_for(std::chrono::milliseconds(task));
+}
+
 void master (int nworker) {
     std::array<int, NTASKS> task, result;
     int done{};
@@ -38,12 +44,6 @@ void master (int nworker) {
     }
 
 
-    /*
-    IMPLEMENT HERE THE CODE FOR THE MASTER
-    ARRAY task contains tasks to be done. Send one element at a time to workers
-    ARRAY result should at completion contain the ranks of the workers that did
-    the corresponding tasks
-    */
     MPI_Request request;
     for(int i{1}; i <= nworker; i++)
         MPI_Isend(&task[i-1], 1, MPI_INT, i, 0, MPI_COMM_WORLD, &request);
@@ -57,20 +57,21 @@ void master (int nworker) {
         MPI_Wait(&request, MPI_STATUS_IGNORE);
     }
 
-    // all sent, 
+    // all sent, time to read and rest
+    std::vector<MPI_Request> requests(nworker);
     for(int i {} ; i < nworker; i++) {
         MPI_Recv(&worker, 1, MPI_INT, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        MPI_Isend(&rest_signal, 1, MPI_INT, worker, 0, MPI_COMM_WORLD, &requests[i]);
         result[done] = worker;
-        MPI_Send(&rest_signal, 1, MPI_INT, worker, 0, MPI_COMM_WORLD);
         done++;
     }
     
     // Print out a status on how many tasks were completed by each worker
     int workdone = 0;
-    for (int worker = 1; worker <= nworker; worker++)
+    for (int worker = 0; worker <= nworker; worker++)
     {
         int tasksdone = 0; 
-        for (int itask=0; itask<NTASKS; itask++)
+        for (int itask=1; itask<NTASKS; itask++)
         if (result[itask]==worker) {
             tasksdone++;
             workdone ++;
@@ -79,13 +80,12 @@ void master (int nworker) {
                     " tasks\n";
     }
                 cout<<"total taskes done " <<workdone <<"\n";
-                cout<<"total tasks " <<NTASKS <<"\n";   
+                cout<<"total tasks " <<NTASKS <<"\n";  
+                
+    MPI_Waitall(nworker, requests.data(), MPI_STATUSES_IGNORE); 
 }
 
-// call this function to complete the task. It sleeps for task milliseconds
-void task_function(int task) {
-    std::this_thread::sleep_for(std::chrono::milliseconds(task));
-}
+
 
 void worker (int rank) {
     while(true){

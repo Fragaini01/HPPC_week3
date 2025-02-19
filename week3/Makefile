@@ -25,3 +25,6 @@ clean:
 
 exercise2: task_farm_HEP task_farm_HEP_seq
 	mpirun -np 4 ./task_farm_HEP > task_farm_HEP.txt
+
+exercise1: task_farm task_farm_HEP task_farm_HEP_seq
+	mpirun -np 4 ./task_farm 
