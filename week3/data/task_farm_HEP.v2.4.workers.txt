@@ -1,7 +1,7 @@
-Worker 1 finished
-Worker 4 finished
 Worker 2 finished
+Worker 1 finished
 Worker 3 finished
+Worker 4 finished
 Best accuracy obtained :0.736576
 Final cuts :
 averageInteractionsPerCrossing : 41.3766
@@ -14,5 +14,5 @@ averageInteractionsPerCrossing : 41.3766
                   p_etaModCalo : 0.0125259
 
 Number of settings:     6561
-Elapsed time      :    10.24
-task time [mus]   :     1561
+Elapsed time      :    9.755
+task time [mus]   :     1487
