@@ -24,12 +24,10 @@ clean:
 	rm -f task_farm task_farm_HEP task_farm_HEP_seq
 
 exercise2: task_farm_HEP task_farm_HEP_seq
-	echo "Running for sequential"; \
-	mpirun ./task_farm_HEP_seq > data/task_farm_HEP_seq.workers.txt ;\
 	for i in 3 4 5 6 7 8 9 10; do \
 	j=$$(($$i-1)); \
 	echo "Running for $$j workers"; \
-	mpirun -np $$i --oversubscribe ./task_farm_HEP > data/task_farm_HEP.v0.$$j.workers.txt ;\
+	mpirun -np $$i --oversubscribe ./task_farm_HEP > data/task_farm_HEP.v1.$$j.workers.txt ;\
 	done
 
 exercise1: task_farm task_farm_HEP task_farm_HEP_seq
