@@ -27,9 +27,7 @@ void task_function(int task)
 
 void master (int nworker) {
     std::array<int, NTASKS> task, result;
-    int done{};
-    int sent{nworker};
-    int worker;
+
 
     // set up a random number generator
     std::random_device rd;
@@ -45,7 +43,15 @@ void master (int nworker) {
 
 
     MPI_Request request;
-    for(int i{1}; i <= nworker; i++)
+    MPI_Isend(&task[0], 1, MPI_INT, 1, 0, MPI_COMM_WORLD, &request); // send the first task to worker 1, still the same, for version 2
+    
+    
+    int done{};
+    int sent{nworker};
+    int worker;
+    int workdone{};
+
+    for(int i{2}; i <= nworker; i++)
         MPI_Isend(&task[i-1], 1, MPI_INT, i, 0, MPI_COMM_WORLD, &request);
 
     while(sent < NTASKS) {
@@ -54,7 +60,7 @@ void master (int nworker) {
         result[done] = worker;
         done++;
         sent++;
-        MPI_Wait(&request, MPI_STATUS_IGNORE);
+        // MPI_Wait(&request, MPI_STATUS_IGNORE); // off in version2, the same result
     }
 
     // all sent, time to read and rest
@@ -67,7 +73,6 @@ void master (int nworker) {
     }
     
     // Print out a status on how many tasks were completed by each worker
-    int workdone = 0;
     for (int worker = 1; worker <= nworker; worker++)
     {
         int tasksdone = 0; 
@@ -90,18 +95,14 @@ void master (int nworker) {
 void worker (int rank) {
     while(true){
     int task ;
-    MPI_Recv(&task, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE); // receive a task from the master
+    MPI_Recv(&task, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE); // receive a task from the master, Tried Irecv working worst
     if (task == rest_signal) {
         std::cout<<"Time to rest for worker " <<rank <<"\n";
         break;
     }
-    else task_function(task);     // execute the task
+    else task_function(task);  // execute the task
     MPI_Send(&rank, 1, MPI_INT, 0, 0, MPI_COMM_WORLD); // send the result back
     }
-    /*
-    IMPLEMENT HERE THE CODE FOR THE WORKER
-    Use a call to "task_function" to complete a task
-    */
 }
 
 int main(int argc, char *argv[]) {

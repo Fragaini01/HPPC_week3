@@ -27,4 +27,8 @@ exercise2: task_farm_HEP task_farm_HEP_seq
 	mpirun -np 4 ./task_farm_HEP > task_farm_HEP.txt
 
 exercise1: task_farm task_farm_HEP task_farm_HEP_seq
-	mpirun -np 4 ./task_farm 
+	for i in 3 4 5 6; do \
+	j=$$(($$i-1)); \
+	echo "Running for $$j workers"; \
+	mpirun -np $$i --oversubscribe ./task_farm > data/task_farm.v2.$$j.workers.txt ;\
+	done
