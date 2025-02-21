@@ -40,18 +40,14 @@ void master (int nworker) {
     for (int& t : task) {
         t = distribution(engine);   // set up some "tasks"
     }
-
-
-    MPI_Request request;
-    MPI_Isend(&task[0], 1, MPI_INT, 1, 0, MPI_COMM_WORLD, &request); // send the first task to worker 1, still the same, for version 2
-    
-    
+ 
     int done{};
     int sent{nworker};
     int worker;
     int workdone{};
+    MPI_Request request;
 
-    for(int i{2}; i <= nworker; i++)
+    for(int i{1}; i <= nworker; i++)
         MPI_Isend(&task[i-1], 1, MPI_INT, i, 0, MPI_COMM_WORLD, &request);
 
     while(sent < NTASKS) {
@@ -60,7 +56,7 @@ void master (int nworker) {
         result[done] = worker;
         done++;
         sent++;
-        // MPI_Wait(&request, MPI_STATUS_IGNORE); // off in version2, the same result
+        MPI_Wait(&request, MPI_STATUS_IGNORE);
     }
 
     // all sent, time to read and rest

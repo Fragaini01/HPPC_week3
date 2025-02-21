@@ -1,0 +1,21 @@
+Time to rest for worker 4
+Time to rest for worker 1
+Time to rest for worker 6
+Time to rest for worker 3
+Time to rest for worker 5
+Time to rest for worker 7
+Time to rest for worker 8
+Time to rest for worker 2
+Master: Worker 1 solved 552 tasks
+Master: Worker 2 solved 560 tasks
+Master: Worker 3 solved 546 tasks
+Master: Worker 4 solved 544 tasks
+Master: Worker 5 solved 530 tasks
+Master: Worker 6 solved 575 tasks
+Time to rest for worker 9
+Master: Worker 7 solved 559 tasks
+Master: Worker 8 solved 558 tasks
+Master: Worker 9 solved 576 tasks
+total taskes done 5000
+total tasks 5000
+Elapsed time: 8.48422 s

@@ -1,0 +1,7 @@
+Time to rest for worker 2
+Time to rest for worker 1
+Master: Worker 1 solved 2510 tasks
+Master: Worker 2 solved 2490 tasks
+total taskes done 5000
+total tasks 5000
+Elapsed time: 38.0695 s
