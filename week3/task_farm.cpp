@@ -45,25 +45,22 @@ void master (int nworker) {
     int sent{nworker};
     int worker;
     int workdone{};
-    MPI_Request request;
 
     for(int i{1}; i <= nworker; i++)
-        MPI_Isend(&task[i-1], 1, MPI_INT, i, 0, MPI_COMM_WORLD, &request);
+        MPI_Send(&task[i-1], 1, MPI_INT, i, 0, MPI_COMM_WORLD);
 
     while(sent < NTASKS) {
         MPI_Recv(&worker, 1, MPI_INT, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-        MPI_Isend(&task[sent], 1, MPI_INT, worker, 0, MPI_COMM_WORLD , &request);
+        MPI_Send(&task[sent], 1, MPI_INT, worker, 0, MPI_COMM_WORLD);
         result[done] = worker;
         done++;
         sent++;
-        MPI_Wait(&request, MPI_STATUS_IGNORE);
     }
 
     // all sent, time to read and rest
-    std::vector<MPI_Request> requests(nworker);
     for(int i {} ; i < nworker; i++) {
         MPI_Recv(&worker, 1, MPI_INT, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-        MPI_Isend(&rest_signal, 1, MPI_INT, worker, 0, MPI_COMM_WORLD, &requests[i]);
+        MPI_Send(&rest_signal, 1, MPI_INT, worker, 0, MPI_COMM_WORLD);
         result[done] = worker;
         done++;
     }
@@ -82,8 +79,6 @@ void master (int nworker) {
     }
                 cout<<"total taskes done " <<workdone <<"\n";
                 cout<<"total tasks " <<NTASKS <<"\n";  
-                
-    MPI_Waitall(nworker, requests.data(), MPI_STATUSES_IGNORE); 
 }
 
 
