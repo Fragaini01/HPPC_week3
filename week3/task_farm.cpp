@@ -45,6 +45,7 @@ void master (int nworker) {
     int sent{nworker};
     int worker;
     int workdone{};
+    MPI_Request request;
 
     for(int i{1}; i <= nworker; i++)
         MPI_Send(&task[i-1], 1, MPI_INT, i, 0, MPI_COMM_WORLD);

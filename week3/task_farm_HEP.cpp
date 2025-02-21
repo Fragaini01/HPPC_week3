@@ -168,6 +168,7 @@ void master (int nworker, Data& ds) {
     std::vector<std::array<double, 8>> settings_sorted(n_settings);
     std::array<double,8> momentaneus_setting;
     std::vector<MPI_Request> requests(nworker);
+    std::array<double, 10> result;
 
     for (int i{2}; i <= nworker; i++)
         MPI_Isend(&settings[i-1], 8, MPI_DOUBLE, i, 0, MPI_COMM_WORLD, &request);
@@ -175,10 +176,11 @@ void master (int nworker, Data& ds) {
     while (sent < n_settings)
     {
         MPI_Request request;
-        MPI_Recv(&worker, 1, MPI_INT, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-        MPI_Recv(&accu, 1, MPI_DOUBLE, worker, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-        MPI_Recv(&momentaneus_setting, 8, MPI_DOUBLE, worker, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        MPI_Recv(result.data(), 10, MPI_DOUBLE, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        worker = static_cast<int>(result[0]);
         MPI_Isend(&settings[sent], 8, MPI_DOUBLE, worker, 0, MPI_COMM_WORLD, &request);
+        accu = result[1];
+        std::copy(result.begin() + 2, result.end(), momentaneus_setting.begin());
         accuracy[done] = accu;
         settings_sorted[done] = momentaneus_setting;
         done++;
@@ -187,17 +189,16 @@ void master (int nworker, Data& ds) {
     }
     for (int i{}; i < nworker; i++)
     {
-        MPI_Recv(&worker, 1, MPI_INT, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-        MPI_Recv(&accu, 1, MPI_DOUBLE, worker, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-        MPI_Recv(&momentaneus_setting, 8, MPI_DOUBLE, worker, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        MPI_Recv(result.data(), 10, MPI_DOUBLE, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        worker = static_cast<int>(result[0]);
         MPI_Isend(&rest_signal, 8, MPI_DOUBLE, worker, 0, MPI_COMM_WORLD , &requests[i]);
+        accu = result[1];
+        std::copy(result.begin() + 2, result.end(), momentaneus_setting.begin());
         settings_sorted[done] = momentaneus_setting;
         accuracy[done] = accu;
         done++;
     }
     auto tend = std::chrono::high_resolution_clock::now(); // end time (nano-seconds)
-    // diagnostics
-    // extract index and value for best accuracy
 
     for (long k=0; k<n_settings; k++)
         if (accuracy[k] > best_accuracy_score) {
@@ -225,6 +226,8 @@ void master (int nworker, Data& ds) {
 
 void worker (int rank, Data& ds) {
     std::array<double, 8> setting;
+    std::array<double, 10> result;
+    MPI_Request request;
      while (true)
     {
     MPI_Recv(&setting, 8, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
@@ -232,10 +235,10 @@ void worker (int rank, Data& ds) {
         std::cout<<"Worker "<<rank<<" finished\n";
         break;
     }
-    double acc = task_function(setting, ds);
-    MPI_Send(&rank, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
-    MPI_Send(&acc, 1, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD);
-    MPI_Send(&setting, 8, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD);
+    result[0] = double(rank);
+    result[1] = task_function(setting, ds);
+    std::copy(setting.begin(), setting.end(), result.begin() + 2);
+    MPI_Isend(result.data(), 10, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD, &request);
     }
     
 }
