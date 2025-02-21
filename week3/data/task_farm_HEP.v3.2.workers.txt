@@ -6,11 +6,11 @@ averageInteractionsPerCrossing : 41.3766
                        p_Rhad1 : 0.0377865
            p_TRTTrackOccupancy : 0.468433
                 p_topoetcone40 : 4.96027
+Worker 2 finished
             p_eTileGap3Cluster : 0.391874
                   p_phiModCalo : 1.51578e-05
                   p_etaModCalo : 0.0125259
 
-Worker 2 finished
 Number of settings:     6561
-Elapsed time      :    16.54
-task time [mus]   :     2521
+Elapsed time      :    16.61
+task time [mus]   :     2532

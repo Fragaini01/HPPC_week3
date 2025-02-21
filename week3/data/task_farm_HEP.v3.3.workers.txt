@@ -13,5 +13,5 @@ averageInteractionsPerCrossing : 41.3766
                   p_etaModCalo : 0.0125259
 
 Number of settings:     6561
-Elapsed time      :    11.17
-task time [mus]   :     1703
+Elapsed time      :    11.28
+task time [mus]   :     1719
