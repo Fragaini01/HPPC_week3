@@ -156,17 +156,18 @@ void master (int nworker, Data& ds) {
     IMPLEMENT HERE THE CODE FOR THE MASTER
     The master should pass a set of settings to a worker, and the worker should return the accuracy
     */
+    MPI_Request request;
+    MPI_Isend(&settings[0], 8, MPI_DOUBLE, 1, 0, MPI_COMM_WORLD, &request);
+
     int done{};
     int sent{nworker};
     int worker;
     double accu;
     std::vector<std::array<double, 8>> settings_sorted(n_settings);
     std::array<double,8> momentaneus_setting;
+    for (int i{2}; i <= nworker; i++)
+        MPI_Isend(&settings[i-1], 8, MPI_DOUBLE, i, 0, MPI_COMM_WORLD, &request);
 
-    for (int i{1}; i <= nworker; i++)
-        MPI_Send(&settings[i-1], 8, MPI_DOUBLE, i, 0, MPI_COMM_WORLD);
-
-    std::cout << "Master: Sent " << nworker << " tasks to workers\n";
     while (sent < n_settings)
     {
         MPI_Request request;
@@ -178,24 +179,19 @@ void master (int nworker, Data& ds) {
         settings_sorted[done] = momentaneus_setting;
         done++;
         sent++;
-        std::cout << "Tasks sent: " << sent<<"/" << n_settings<<"\nAccuracy : " <<accu << "\r" << std::flush;
-
         MPI_Wait(&request, MPI_STATUS_IGNORE);
     }
-
-    
+    std::vector<MPI_Request> requests(nworker);
     for (int i{}; i < nworker; i++)
     {
         MPI_Recv(&worker, 1, MPI_INT, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
         MPI_Recv(&accu, 1, MPI_DOUBLE, worker, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
         MPI_Recv(&momentaneus_setting, 8, MPI_DOUBLE, worker, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        MPI_Isend(&rest_signal, 8, MPI_DOUBLE, worker, 0, MPI_COMM_WORLD , &requests[i]);
         settings_sorted[done] = momentaneus_setting;
         accuracy[done] = accu;
-        MPI_Send(&rest_signal, 8, MPI_DOUBLE, worker, 0, MPI_COMM_WORLD);
         done++;
     }
-    std::cout<<"total taskes done " <<done <<"\n";
-    std::cout<<"total tasks " <<n_settings <<"\n";
     auto tend = std::chrono::high_resolution_clock::now(); // end time (nano-seconds)
     // diagnostics
     // extract index and value for best accuracy
@@ -221,6 +217,8 @@ void master (int nworker, Data& ds) {
               << (tend - tstart).count()*1e-9 << "\n";
     std::cout <<  "task time [mus]   :" << std::setw(9) << std::setprecision(4)
               << (tend - tstart).count()*1e-3 / n_settings << "\n";
+    
+    MPI_Waitall(nworker, requests.data(), MPI_STATUSES_IGNORE);
 }
 
 void worker (int rank, Data& ds) {
