@@ -173,14 +173,13 @@ void master (int nworker, Data& ds) {
         MPI_Recv(&worker, 1, MPI_INT, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
         MPI_Recv(&accu, 1, MPI_DOUBLE, worker, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
         MPI_Recv(&momentaneus_setting, 8, MPI_DOUBLE, worker, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-        MPI_Isend(&settings[sent], 8, MPI_DOUBLE, worker, 0, MPI_COMM_WORLD, &request);
+        MPI_Send(&settings[sent], 8, MPI_DOUBLE, worker, 0, MPI_COMM_WORLD);
         accuracy[done] = accu;
         settings_sorted[done] = momentaneus_setting;
         done++;
         sent++;
         std::cout << "Tasks sent: " << sent<<"/" << n_settings<<"\nAccuracy : " <<accu << "\r" << std::flush;
 
-        MPI_Wait(&request, MPI_STATUS_IGNORE);
     }
 
     // all sent,
