@@ -1,7 +1,7 @@
 Time to rest for worker 2
-Master: Worker 1 solved 2522 tasks
-Master: Worker 2 solved 2478 tasks
+Master: Worker 1 solved 2506 tasks
+Master: Worker 2 solved 2494 tasks
 total taskes done 5000
-total tasks 5000
-Elapsed time: 38.0431 s
 Time to rest for worker 1
+total tasks 5000
+Elapsed time: 37.9987 s

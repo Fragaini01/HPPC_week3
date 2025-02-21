@@ -1,0 +1,23 @@
+Worker 4 finished
+Worker 3 finished
+Worker 1 finished
+Worker 9 finished
+Worker 7 finished
+Worker 5 finished
+Worker 2 finished
+Worker 6 finished
+Best accuracy obtained :0.736576
+Final cuts :
+Worker 8 finished
+averageInteractionsPerCrossing : 41.3766
+                        p_Rhad : 0.05993
+                       p_Rhad1 : 0.0377865
+           p_TRTTrackOccupancy : 0.468433
+                p_topoetcone40 : 4.96027
+            p_eTileGap3Cluster : 0.391874
+                  p_phiModCalo : 1.51578e-05
+                  p_etaModCalo : 0.0125259
+
+Number of settings:     6561
+Elapsed time      :    3.497
+task time [mus]   :    533.1
